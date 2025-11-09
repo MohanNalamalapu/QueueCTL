@@ -63,19 +63,19 @@ npm link
 ```
 
 Usage Guide (with Explanations)
-Each command below can be copied directly into PowerShell during your video demo.
-After each command, explain briefly what it demonstrates.
 
-Check Setup
+Each command below can be copied directly into PowerShell.
+
+1. Check Setup
 
 ```powershell
 queuectl --version
 queuectl --help
 ```
 
-Verifies the CLI tool is correctly linked and accessible.
+    Verifies the CLI tool is correctly linked and accessible.
 
-Reset Previous State
+2. Reset Previous State
 
 ```powershell
 if (Test-Path .\.workers.pid) {
@@ -87,9 +87,9 @@ if (Test-Path .\.workers.pid) {
 Remove-Item .\queue.db -ErrorAction SilentlyContinue
 ```
 
-Stops any running workers and deletes the old database for a clean start.
+    Stops any running workers and deletes the old database for a clean start.
 
-Configuration Management
+3. Configuration Management
 
 ```powershell
 queuectl config set max_retries 2
@@ -97,9 +97,9 @@ queuectl config set backoff_base 2
 queuectl status
 ```
 
-Sets retry and backoff parameters and checks the initial job summary.
+    Sets retry and backoff parameters and checks the initial job summary.
 
-Successful Job Execution
+4. Successful Job Execution
 
 ```powershell
 queuectl enqueue --id demo-complete --command "echo demo-ok"
@@ -109,9 +109,9 @@ queuectl list --state completed
 queuectl worker stop
 ```
 
-Shows a basic successful job running through the system.
+    Shows a basic successful job running through the system.
 
-Failed Job → Retry → DLQ
+5. Failed Job → Retry → DLQ
 
 ```powershell
 queuectl enqueue --id demo-fail --command "node -e \"process.exit(1)\"" --max-retries 2
@@ -122,9 +122,9 @@ queuectl dlq list
 queuectl worker stop
 ```
 
-Demonstrates automatic retries, exponential backoff, and a job moved to the DLQ after max attempts.
+    Demonstrates automatic retries, exponential backoff, and a job moved to the DLQ after max attempts.
 
-Multiple Workers & Parallel Jobs
+6. Multiple Workers & Parallel Jobs
 
 ```powershell
 for ($i=1; $i -le 6; $i++) {
@@ -137,9 +137,9 @@ queuectl list --state completed
 queuectl worker stop
 ```
 
-Runs six jobs concurrently using three worker processes.
+    Runs six jobs concurrently using three worker processes.
 
-Job Persistence Across Restart
+7. Job Persistence Across Restart
 
 ```powershell
 queuectl enqueue --id persist-demo --command "echo persist"
@@ -150,9 +150,9 @@ queuectl list --state completed
 queuectl worker stop
 ```
 
-Demonstrates persistence — job data remains even after restart.
+    Demonstrates persistence — job data remains even after restart.
 
-Priority & Scheduled Jobs (Bonus)
+8. Priority & Scheduled Jobs (Bonus)
 
 ```powershell
 queuectl enqueue --id high-priority --command "echo high-priority" --priority 10
@@ -170,17 +170,9 @@ queuectl list --state completed
 queuectl worker stop
 ```
 
-Shows job priority handling and delayed job execution.
+    Shows job priority handling and delayed job execution.
 
-Automated Smoke Test
-
-```powershell
-npm run demo:smoke
-```
-
-Runs automated tests verifying enqueue, execution, retries, DLQ, and persistence.
-
-Final Status Summary
+9. Final Status Summary
 
 ```powershell
 queuectl status
@@ -188,16 +180,24 @@ queuectl list --state completed
 queuectl dlq list
 ```
 
-Displays the final state of the queue and verifies all features worked.
+    Displays the final state of the queue and verifies all features worked.
 
-Video Demonstration
+10. Automated Smoke Test
 
-Demo Video: Click here to view the demo  
+```powershell
+npm run demo:smoke
+```
 
+    Runs automated tests verifying enqueue, execution, retries, DLQ, and persistence.
 
-The video follows the same sequence of commands as shown above. Each section briefly explains what’s being demonstrated.
+11. Video Demonstration
+    [Video Demo](https://drive.google.com/file/d/1jzRYIRurKr5ZmuU_flJDSJgdk3cBRWxC/view?usp=sharing)
+  
+    The video follows the same sequence of commands as shown above. Each section briefly explains what’s being demonstrated.
 
-Testing & Validation
+---
+
+## Testing & Validation
 Smoke tests (in /src/demo/smoke-test.js) verify:
 
 - Job enqueue/dequeue
@@ -211,99 +211,11 @@ Run using:
 ```powershell
 npm run demo:smoke
 ```
-
-Architecture Overview
-Queue Manager: Handles enqueue/dequeue, persistence, and job states.
-
-Worker Processes: Execute jobs concurrently; communicate via SQLite locks.
-
-Retry Mechanism: Implements exponential backoff (delay = base^attempts).
-
-Dead Letter Queue: Moves permanently failed jobs after max retries.
-
-Persistence: All jobs stored in SQLite and survive restarts.
-
-Config Manager: Adjusts retry/backoff values via CLI.
-
 ---
-
-## References
-
-### Core Dependencies
-- **Commander.js** – Complete solution for Node.js command-line interfaces  
-- **better-sqlite3** – Native SQLite binding used for persistence  
-- **Chalk** – Terminal string styling  
-- **Figlet** – ASCII art text generator  
-- **Ora** – Elegant terminal spinner  
-- **Boxen** – Create boxes in the terminal  
-- **cli-table3** – Beautiful formatted tables  
-
-### Learning Resources
-#### CLI Development
-- [How CLIs in Node.js Actually Work](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/CLI)
-- [Building a Command Line Tool with Node.js](https://www.sitepoint.com/javascript-command-line-interface-cli-node-js/)
-- [Commander.js Documentation](https://github.com/tj/commander.js/)
-
-#### Queue & Background Jobs
-- [Node.js Background Jobs & Workers](https://blog.logrocket.com/background-jobs-in-nodejs/)
-- [Building a Job Queue in Node.js](https://dev.to/jorgec/building-a-job-queue-in-node-js-48g2)
-- [SQLite3 Node.js Guide](https://www.sqlitetutorial.net/sqlite-nodejs/)
-- [SQLite with Node.js Tutorial](https://www.freecodecamp.org/news/using-sqlite-with-nodejs/)
-
-#### CLI UX Best Practices
-- [Command Line Interface Guidelines](https://clig.dev/)
-- [14 Great Tips to Make Amazing CLI Applications](https://dev.to/danielkhowell/14-great-tips-to-make-amazing-cli-applications-4o9l)
-- [12 Factor CLI Apps](https://12factor.net/)
-
-----
-
-Assumptions & Trade-offs
-Assumptions
-
-Running on Node.js with a single SQLite database file
-
-Moderate job volume (not designed for thousands of jobs per second)
-
-Jobs complete within a reasonable time (no long-running batch processes)
-
-No distributed execution across multiple machines
-
-Both CLI and web dashboard interfaces available for future integration
-
-Tooling Choices
-
-Commander.js for building the CLI interface
-
-Simple and well-documented
-
-Great community support
-
-Built-in help generation
-
-Express.js for optional dashboard (future extension)
-
-Lightweight and fast
-
-Easy to integrate with Node.js
-
-Large ecosystem of middleware
-
-SQLite for data persistence
-
-Zero-configuration single-file database
-
-Fast enough for local job queue storage
-
-Chalk & Ora for CLI UX
-
-Enhanced terminal output formatting
-
-Loading spinners for improved user feedback
-
-Trade-offs
-
-Chose SQLite for simplicity over distributed databases
-
-Single-node architecture limits scalability for high loads
-
-Basic retry and error handling without distributed recovery
+### Architecture Overview
+- Queue Manager: Handles enqueue/dequeue, persistence, and job states.
+- Worker Processes: Execute jobs concurrently; communicate via SQLite locks.
+- Retry Mechanism: Implements exponential backoff (delay = base^attempts).
+- Dead Letter Queue: Moves permanently failed jobs after max retries.
+- Persistence: All jobs stored in SQLite and survive restarts.
+- Config Manager: Adjusts retry/backoff values via CLI.
