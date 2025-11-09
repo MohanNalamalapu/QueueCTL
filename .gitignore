@@ -1,0 +1,10 @@
+node_modules/
+queue.db
+.workers.pid
+*.log
+.DS_Store
+*.swp
+*.swo
+*~
+
+
