@@ -3,7 +3,6 @@
 QueueCTL is a Node.js-based command-line tool that manages background job processing.  
 It supports multiple workers, job retries with exponential backoff, a persistent SQLite store, and a Dead Letter Queue (DLQ) for failed tasks.  
 
-This project was developed as part of the **Backend Developer Internship Assignment**.
 
 ---
 
